@@ -1,8 +1,20 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Mohave, Roboto } from 'next/font/google';
 import './globals.css';
+import Header from './components/Header/Header';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const mohave = Mohave({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-mohave',
+});
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-roboto',
+});
 
 export const metadata: Metadata = {
   title: 'Marketing Site Factory',
@@ -15,8 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={`${inter.variable} ${mohave.variable} ${roboto.variable}`}>
+      <body className={inter.className}>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }

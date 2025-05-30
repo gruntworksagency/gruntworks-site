@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: Inter, system-ui, sans-serif;
+    font-family: var(--font-roboto), var(--font-inter), system-ui, sans-serif;
   }
 
   body {
@@ -17,10 +17,65 @@
   h4,
   h5,
   h6 {
-    @apply font-semibold text-neutral-900;
+    @apply font-display font-semibold text-brand-charcoalBlack;
   }
 
   a {
     @apply text-primary-600 hover:text-primary-700 transition-colors;
+  }
+}
+
+@layer utilities {
+  @keyframes grow {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-grow {
+    animation: grow 200ms ease-out forwards;
+  }
+
+  .how-it-works-gradient-overlay::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 128px;
+    /* 8rem or h-32 */
+    background-image: linear-gradient(to bottom, #1d150e, rgba(29, 21, 14, 0));
+    z-index: 1;
+  }
+
+  .film-grain-overlay {
+    position: relative;
+    /* Ensure this or parent is relative */
+  }
+
+  .film-grain-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/textures/film-grain.png');
+    /* Ensure texture exists */
+    opacity: 0.12;
+    /* 12% opacity */
+    mix-blend-mode: overlay;
+    /* Blend mode overlay */
+    pointer-events: none;
+    z-index: 1;
+    /* To sit on top of the image */
+    border-radius: inherit;
+    /* Inherit border-radius from parent if it's rounded */
   }
 }

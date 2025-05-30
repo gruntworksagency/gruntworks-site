@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Global UI System 
+**Element**	 |  **Spec**
+Grid: 12-col / 8 pt rhythm; 1440 px max; 2 rem outer gutters.
+Spacing: XS 4 px · S 8 px · M 16 px · L 32 px · XL 64 px.
+Corners: 12 px radius; badges keep truncated-hex shape.
+Buttons: Primary = Safety Orange bg, Cream text, inset shadow; hover shifts hue +3%.
+Cards: Charcoal bg → hover lifts +4 px, subtle soil-grain overlay 10% opacity.
+Texture layer: Film-grain overlay on photos 12% opacity (blend = overlay).
+Motion: 200 ms ease-out; parallax on hero bg only; no scroll-jacking.
+
