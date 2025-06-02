@@ -7,6 +7,12 @@ import { NextPage } from 'next';
 
 // Import the TestimonialsSection component and types
 import { TestimonialsSection, type TestimonialData } from '@/app/components/TestimonialsSection';
+import CtaBanner from '@/app/components/CtaBanner/CtaBanner';
+import FAQAccordionSection, { FAQItem } from '@/app/components/FAQAccordionSection/FAQAccordionSection';
+import PricingComparisonSection, {
+  type PricingComparisonSectionProps
+} from '@/app/components/PricingComparisonSection';
+import { Zap } from 'lucide-react';
 
 // Define dummy testimonial data
 const DUMMY_TESTIMONIALS: TestimonialData[] = [
@@ -39,6 +45,99 @@ const DUMMY_TESTIMONIALS: TestimonialData[] = [
   }
 ];
 
+const DUMMY_FAQS: FAQItem[] = [
+  {
+    id: 'crm',
+    question: 'What types of automation solutions does GPC provide?',
+    answer: '<p>There are four umbrella processes ...</p>'
+  },
+  {
+    id: 'benefit',
+    question: 'How can automation benefit my company?',
+    answer: '<p>Automation reduces manual errors ...</p>'
+  }
+];
+
+// Define dummy pricing data
+const DUMMY_PRICING_DATA: PricingComparisonSectionProps = {
+  headline: "Picture Your Landscaping Business…Winning.",
+  subtext: "More visibility. More leads. More jobs. See how Gruntworks stacks up against other solutions and discover the unbeatable value we offer.",
+  offers: [
+    {
+      id: "diy",
+      name: "DIY SaaS Tools",
+      priceNote: "Multiple subscriptions",
+      mainDifferentiator: "Manual Effort & Subscription Model"
+    },
+    {
+      id: "gruntworks",
+      name: "🌟 Gruntworks",
+      priceNote: "$149 One-Time Audit",
+      icon: <Zap size={24} />,
+      mainDifferentiator: "Automated Audit & One-Time Value"
+    },
+    {
+      id: "agency",
+      name: "Traditional Agency",
+      priceNote: "High retainers",
+      mainDifferentiator: "High Cost: $2,000+"
+    }
+  ],
+  features: [
+    {
+      label: "Cost Effectiveness",
+      values: {
+        diy: "💸 $/mo",
+        gruntworks: "💰 $/one-time",
+        agency: "💸💸💸 $2,000+"
+      }
+    },
+    {
+      label: "Setup Speed & Simplicity",
+      values: {
+        diy: "🕑 Hours/Days",
+        gruntworks: "✅ 5 Minutes",
+        agency: "🕑 Days to Weeks"
+      }
+    },
+    {
+      label: "Local SEO Audit Depth",
+      values: {
+        diy: "⚠️ Basic Ranking Data",
+        gruntworks: "✅ 100-Point Super Deep Custom Report",
+        agency: "⚠️ Varies by Agency (Costly)"
+      }
+    },
+    {
+      label: "Size of Heatmap Region",
+      values: {
+        diy: "⚠️ Defaults to Small Grid",
+        gruntworks: "✅ Entire Metro Area (1,000sq mi+)",
+        agency: "⚠️ Custom (Extra Costs)"
+      }
+    },
+    {
+      label: "Actionable Insights",
+      values: {
+        diy: "⚠️ Basic / Very Limited",
+        gruntworks: "✅ A Custom 30-Day Playbook",
+        agency: "❌ Likely Hidden / For Agency Use Only"
+      }
+    },
+    {
+      label: "Return on Investment",
+      values: {
+        diy: "⚠️ Low/Uncertain",
+        gruntworks: "✅ Massive/Fast",
+        agency: "🤔 Good/Slow"
+      }
+    }
+  ],
+  highlightId: "gruntworks",
+  ctaLabel: "Start Your Audit Now",
+  ctaHref: "/start-audit-now"
+};
+
 const HomePage: NextPage = () => {
   return (
     <main>
@@ -51,6 +150,14 @@ const HomePage: NextPage = () => {
         subtext="Hear from mid-sized landscapers thriving with Gruntworks."
         testimonials={DUMMY_TESTIMONIALS}
       />
+      <CtaBanner />
+      <FAQAccordionSection
+        items={DUMMY_FAQS}
+        ctaLabel="View More FAQ's"
+        ctaHref="/faqs"
+      />
+      {/* Add the PricingComparisonSection */}
+      <PricingComparisonSection {...DUMMY_PRICING_DATA} />
     </main>
   );
 };

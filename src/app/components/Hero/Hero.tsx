@@ -67,7 +67,7 @@ const Hero: React.FC<HeroProps> = () => {
   }, [calculateDynamicTranslateY]);
 
   return (
-    <section ref={heroSectionRef} className="relative bg-black overflow-hidden min-h-screen flex flex-col justify-center">
+    <section ref={heroSectionRef} className="relative bg-[#d4e3de] overflow-hidden min-h-screen flex flex-col justify-center">
       {/* Background Image */}
       <div
         className="absolute inset-0 mt-[175px]"

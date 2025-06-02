@@ -36,4 +36,4 @@ Follow these rules when you write code:
 *   Use descriptive variable and function/component names. Event handler functions should be named with a “handle” prefix, like `handleClick` for `onClick` and `handleKeyDown` for `onKeyDown`.
 *   Implement accessibility (a11y) features on elements. For interactive elements, ensure they are keyboard navigable and have appropriate ARIA attributes. For example, custom interactive elements might need `tabindex="0"` (if not naturally focusable), appropriate `role` attributes, an `aria-label` or `aria-labelledby` for clarity, and event handlers like `onClick` and `onKeyDown`. Standard HTML elements like `<button>` and `<a href="...">` have built-in accessibility, so use them semantically.
 *   Prefer using arrow functions assigned to `const` for React components and utility functions, for example, `const MyComponent: React.FC<Props> = (props) => { ... };`. Always define types for props, state, and function signatures when using TypeScript.
-
+*   **Use PNPM for all package management operations instead of NPM.**

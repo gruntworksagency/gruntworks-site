@@ -53,6 +53,7 @@ const Features: React.FC = () => {
                 alt={`Background for ${card.title} card`}
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 358px"
               />
               <div className="absolute bottom-0 w-full p-4">
                 <h3 className="text-gray-900 text-xl font-black">{card.title}</h3>

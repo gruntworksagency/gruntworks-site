@@ -102,13 +102,12 @@ export function TestimonialCard({
         {text}
       </p>
 
-      {/* Subtle soil-grain overlay on hover for the card */}
       <div
         className={cn(
-          "absolute inset-0 z-0 opacity-0 group-hover:opacity-10 transition-opacity duration-200 ease-out",
+          "absolute inset-0 z-0 opacity-10 transition-opacity duration-200 ease-out",
           "bg-blend-overlay"
         )}
-        style={{ backgroundImage: "url('/textures/soil-grain.png')" }}
+        style={{ backgroundImage: "url('/textures/soil-grain-overlay.png')" }}
       />
     </CardComponent>
   )

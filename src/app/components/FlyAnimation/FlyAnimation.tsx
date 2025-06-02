@@ -47,12 +47,6 @@ const getAbsolutePosition = (
   const x = targetRect.left - containerRect.left + targetRect.width / 2 + (offset.x || 0);
   const y = targetRect.top - containerRect.top + targetRect.height / 2 + (offset.y || 0);
 
-  console.log(`[FlyAnimation] getAbsolutePosition for ${targetKey}:`,
-    `\n  Target Rect: {left: ${targetRect.left.toFixed(2)}, top: ${targetRect.top.toFixed(2)}, width: ${targetRect.width.toFixed(2)}, height: ${targetRect.height.toFixed(2)}}`,
-    `\n  Container Rect: {left: ${containerRect.left.toFixed(2)}, top: ${containerRect.top.toFixed(2)}}`,
-    `\n  Offset: {x: ${offset.x || 0}, y: ${offset.y || 0}}`,
-    `\n  Calculated: {x: ${x.toFixed(2)}, y: ${y.toFixed(2)}}`);
-
   return { x, y };
 };
 
@@ -160,8 +154,6 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
       const nextIndex = (sequenceIndex + 1) % sequence.length;
       const destinationKey = sequence[nextIndex];
 
-      console.log(`[FlyAnimation] Animating from ${sourceKey} (index ${sequenceIndex}) to ${destinationKey} (index ${nextIndex})`);
-
       let pathStartPos: { x: number; y: number } | null = null;
       if (currentFlyTopLeft) {
         pathStartPos = {
@@ -169,28 +161,15 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
           y: currentFlyTopLeft.y + flyHeight / 2,
         };
       } else {
-        console.error("[FlyAnimation] currentFlyTopLeft is null. Falling back to getAbsolutePosition for sourceKey:", sourceKey);
         pathStartPos = getAbsolutePosition(sourceKey, targetRefs, targetOffsets, containerRef.current!);
       }
 
       const pathEndPos = getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerRef.current!);
 
       if (!pathStartPos || !pathEndPos) {
-        console.error("FlyAnimation: Could not determine start or end positions for flight.", {
-          sourceKey,
-          destinationKey,
-          calculatedStart: pathStartPos,
-          calculatedEnd: pathEndPos,
-          currentFlyTopLeft
-        });
-
         if (pathStartPos && !pathEndPos) {
-          // If start is known but end is not, pause at current position
-          console.warn(`[FlyAnimation] End position for ${destinationKey} not found. Pausing at current location.`);
           await new Promise(resolve => setTimeout(resolve, pauseDuration));
         } else if (!pathStartPos && pathEndPos && containerRef.current) {
-          // If start is unknown but end is known, try to jump to endPos and continue sequence. This is a recovery attempt.
-          console.warn(`[FlyAnimation] Start position for ${sourceKey} not found. Attempting to jump to ${destinationKey}.`);
           const newTopLeft = { x: pathEndPos.x - flyWidth / 2, y: pathEndPos.y - flyHeight / 2 };
           flyControls.set(newTopLeft);
           setCurrentFlyTopLeft(newTopLeft);
@@ -201,9 +180,6 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
         return;
       }
 
-      console.log(`[FlyAnimation] Path Positions - Start (center): {x: ${pathStartPos.x.toFixed(2)}, y: ${pathStartPos.y.toFixed(2)}}, End (center): {x: ${pathEndPos.x.toFixed(2)}, y: ${pathEndPos.y.toFixed(2)}}`);
-      console.log(`[FlyAnimation] Fly's current top-left before pause:`, currentFlyTopLeft);
-      // 1. Pause at Current Target
       await new Promise(resolve => setTimeout(resolve, pauseDuration));
 
       // 2. Pre-Flight Flip Animation
@@ -278,15 +254,16 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
       style={{
         position: 'absolute',
         zIndex: 30, // As per original
-        width: flyWidth,
-        height: flyHeight,
+        // Removed width and height from parent div, letting Image handle size
+        // width: flyWidth,
+        // height: flyHeight,
         // transformOrigin: 'center center', // Good for rotations, not strictly needed now
       }}
       aria-hidden="true"
     >
-      <Image src="/fly.png" alt="animated fly" width={flyWidth} height={flyHeight} priority />
+      <Image src="/fly.png" alt="animated fly" width={flyWidth} height={flyHeight} priority style={{ width: 'auto', height: 'auto' }} />
     </motion.div>
   );
 };
 
-export default FlyAnimation; 
+export default FlyAnimation;

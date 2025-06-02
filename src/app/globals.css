@@ -66,7 +66,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('/textures/film-grain.png');
+    background-image: url('/textures/soil-grain-overlay.png');
     /* Ensure texture exists */
     opacity: 0.12;
     /* 12% opacity */
