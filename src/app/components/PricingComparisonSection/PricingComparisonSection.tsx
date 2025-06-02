@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import CtaButton from '../UI/CtaButton';
 
 // VisuallyHidden component for accessibility with emojis/icons
 const VisuallyHidden: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -124,28 +125,6 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
 
   const ctaButtonId = "pricing-cta-button";
   const headlineId = "pricing-headline";
-
-  // CTA Button component
-  const renderCTA = (isEmbeddedInCard = false) => (
-    <motion.a
-      id={!isEmbeddedInCard ? ctaButtonId : undefined}
-      href={ctaHref}
-      aria-describedby={!isEmbeddedInCard ? headlineId : undefined}
-      className={twMerge(`
-        inline-flex items-center justify-center bg-orange-500 text-neutral-950 font-semibold
-        py-3 px-8 rounded-lg transition-all duration-200 ease-in-out
-        hover:translate-y-[-2px] hover:shadow-lg
-        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500
-        active:scale-97 active:translate-y-[-1px]
-        ${isEmbeddedInCard ? 'w-full sm:w-auto' : 'mt-10 md:mt-12'}
-      `)}
-      whileHover={{ transform: 'translateY(-2px)' }}
-      whileTap={{ scale: 0.97, transform: 'translateY(-1px)' }}
-      transition={{ duration: 0.15 }}
-    >
-      {ctaLabel}
-    </motion.a>
-  );
 
   const centerOfferIndex = 1;
   const isCenterOfferHighlighted = offers[centerOfferIndex]?.id === highlightId;
@@ -278,12 +257,33 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
 
               {isCenterCard && isHighlighted && (
                 <div className="mt-auto pt-6 text-center sm:hidden md:block">
-                  {renderCTA(true)}
+                  <CtaButton
+                    as="motion.a"
+                    href={ctaHref}
+                    id={ctaButtonId}
+                    aria-describedby={headlineId}
+                    className="w-full sm:w-auto"
+                  >
+                    {ctaLabel}
+                  </CtaButton>
                 </div>
               )}
             </motion.div>
           );
         })}
+      </div>
+
+      {/* Centered CTA Button */}
+      <div className="text-center mt-12">
+        <CtaButton
+          as="motion.a"
+          href={ctaHref}
+          id={ctaButtonId}
+          aria-describedby={headlineId}
+          className="mt-10 md:mt-12"
+        >
+          {ctaLabel}
+        </CtaButton>
       </div>
     </section>
   );

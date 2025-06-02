@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import clsx from 'clsx';
+import CtaButton from '../UI/CtaButton';
 
 // Define types for navigation links and submenu items if they become props later
 // interface NavLink {
@@ -106,12 +107,13 @@ const Header: React.FC = () => {
 
           {/* Right-aligned Action Button */}
           <div>
-            <Link
+            <CtaButton
+              as="link"
               href="/audit"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md flex items-center transition-colors shadow-sm"
+              className="px-4 py-2 text-sm shadow-sm"
             >
               Start Audit <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            </CtaButton>
           </div>
         </div>
 

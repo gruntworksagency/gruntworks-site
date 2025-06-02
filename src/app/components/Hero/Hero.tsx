@@ -6,6 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { ArrowRight } from 'lucide-react';
 import FlyAnimation from '../FlyAnimation/FlyAnimation';
 import Pill from '../UI/Pill';
+import CtaButton from '../UI/CtaButton';
 
 const HERO_BG_PARALLAX_BASE_SPEED_FACTOR = 0.6; // Initial speed: 0.3 means bg moves 30px for 100px scroll
 const HERO_BG_PARALLAX_SPEED_INCREASE_RATE = 1.1; // Speed increases by 10%
@@ -130,17 +131,14 @@ const Hero: React.FC<HeroProps> = () => {
               </div>
             </div>
 
-            <button
+            <CtaButton
               ref={ctaButtonRef}
-              className={twMerge(
-                clsx(
-                  'bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center gap-2 border-2 border-orange-200 shadow-md transition-colors'
-                )
-              )}
+              as="button"
+              className="py-4 px-6 flex items-center gap-2 border-2 border-orange-200"
             >
               ⚡ Start My Audit
               <ArrowRight className="h-5 w-5" />
-            </button>
+            </CtaButton>
           </div>
         </div>
 
