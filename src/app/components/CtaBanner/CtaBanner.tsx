@@ -5,7 +5,14 @@ import { Check } from 'lucide-react';
 
 const CtaBanner: React.FC = () => {
   return (
-    <section className="bg-yellow-50 py-16 md:py-24">
+    <section
+      className="bg-yellow-50 py-16 md:py-24"
+      style={{
+        backgroundImage: "url('/heatworks-pattern-1.png')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "auto",
+      }}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-xl max-w-4xl mx-auto shadow-xl overflow-hidden md:flex md:items-stretch min-h-[20rem]">
           {/* Text Content Area */}
@@ -27,8 +34,10 @@ const CtaBanner: React.FC = () => {
                 <span>30-day playbook</span>
               </li>
             </ul>
-            <CtaButton aria-label="Book a free consultation">
-              Book Free Consultation
+            <CtaButton
+              href="/audit"
+            >
+              Start Audit
             </CtaButton>
           </div>
 

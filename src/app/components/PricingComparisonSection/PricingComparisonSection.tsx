@@ -1,8 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
 import { twMerge } from 'tailwind-merge';
 import CtaButton from '../UI/CtaButton';
 
@@ -25,6 +24,17 @@ const VisuallyHidden: React.FC<{ children: React.ReactNode }> = ({ children }) =
     {children}
   </span>
 );
+
+// Define EMOJI_ARIA_MAP at module level
+const EMOJI_ARIA_MAP: Record<string, string> = {
+  '✅': 'Feature included.',
+  '⚠️': 'Feature has limitations.',
+  '💸': 'Cost implication.',
+  '💰': 'Cost implication.',
+  '🕑': 'Time related information.',
+  '❌': 'Feature not included.',
+  '🤔': 'Consideration or mixed outcome.',
+};
 
 // Define the props interfaces
 export interface Offer {
@@ -71,13 +81,8 @@ const parseFeatureValue = (value: string | React.ReactNode): React.ReactNode => 
   }
 
   let ariaText = '';
-  if (emojiDisplay) {
-    if (emojiDisplay === '✅') ariaText = 'Feature included.';
-    else if (emojiDisplay === '⚠️') ariaText = 'Feature has limitations.';
-    else if (emojiDisplay === '💸' || emojiDisplay === '💰') ariaText = 'Cost implication.';
-    else if (emojiDisplay === '🕑') ariaText = 'Time related information.';
-    else if (emojiDisplay === '❌') ariaText = 'Feature not included.';
-    else if (emojiDisplay === '🤔') ariaText = 'Consideration or mixed outcome.';
+  if (emojiDisplay && EMOJI_ARIA_MAP[emojiDisplay]) {
+    ariaText = EMOJI_ARIA_MAP[emojiDisplay];
   }
 
   return (
@@ -90,6 +95,107 @@ const parseFeatureValue = (value: string | React.ReactNode): React.ReactNode => 
       {ariaText && <VisuallyHidden>{ariaText}</VisuallyHidden>}
       <span className={`flex-grow ${!emojiDisplay ? 'pl-7' : ''}`}>{textContent}</span>
     </div>
+  );
+};
+
+// Define the new PricingCard component here
+interface PricingCardProps {
+  offer: Offer;
+  offerIndex: number;
+  isHighlighted: boolean;
+  isCenterCard: boolean;
+  features: FeatureRow[];
+  cardVariants: Variants;
+  scaleClass: string;
+  orderClasses: string;
+}
+
+const PricingCard: React.FC<PricingCardProps> = ({
+  offer,
+  offerIndex,
+  isHighlighted,
+  isCenterCard,
+  features,
+  cardVariants,
+  scaleClass,
+  orderClasses,
+}) => {
+  return (
+    <motion.div
+      custom={offerIndex}
+      initial="hidden"
+      animate="visible"
+      variants={cardVariants}
+      role="group"
+      aria-labelledby={`offer-${offer.id}-name`}
+      className={twMerge(`
+        rounded-2xl bg-neutral-800 dark:bg-neutral-100 p-6 flex flex-col text-neutral-50 dark:text-neutral-900
+        focus-within:ring-4 focus-within:ring-orange-500/70 dark:focus-within:ring-orange-600/70
+        transition-all duration-300 ease-out
+        ${isHighlighted ? `ring-4 ring-orange-500 dark:ring-orange-600 shadow-2xl relative ${scaleClass}` : 'shadow-lg hover:shadow-xl'}
+        ${isHighlighted && isCenterCard && 'lg:z-10'}
+        ${isHighlighted && isCenterCard ? 'lg:origin-top' : ''}
+      `, orderClasses)}
+    >
+      {isHighlighted && (
+        <div
+          aria-label="Best value"
+          className="absolute -top-3.5 right-3.5 bg-orange-500 text-neutral-950 text-xs font-semibold px-2.5 py-1 rounded-full shadow-md"
+        >
+          Best Value
+        </div>
+      )}
+
+      <div className="text-center mb-4">
+        <h3
+          id={`offer-${offer.id}-name`}
+          className="text-xl lg:text-2xl font-semibold mb-1 flex items-center justify-center gap-2 text-neutral-50 dark:text-neutral-900"
+        >
+          {offer.icon && <span className="inline-block text-orange-400 dark:text-orange-500">{offer.icon}</span>}
+          {offer.name}
+        </h3>
+        {offer.priceNote && (
+          <p className="text-xs text-neutral-400 dark:text-neutral-500">
+            {offer.priceNote}
+          </p>
+        )}
+      </div>
+
+      {offer.mainDifferentiator && (
+        <div className={twMerge(`text-center px-2 py-3 mb-4 rounded-lg
+          ${isHighlighted ? 'bg-orange-500/10 dark:bg-orange-500/20' : 'bg-neutral-700/50 dark:bg-neutral-200/80'}`)}
+        >
+          <p className={twMerge(`font-semibold text-sm ${isHighlighted ? 'text-orange-300 dark:text-orange-400' : 'text-neutral-200 dark:text-neutral-700'}`)}>
+            {offer.mainDifferentiator}
+          </p>
+        </div>
+      )}
+
+      <div className="my-2 flex-grow">
+        {features.map((feature) => (
+          <div
+            key={feature.label}
+            className="text-sm border-t border-neutral-700 dark:border-neutral-300 py-3"
+          >
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-1.5 font-medium break-words">{feature.label}</p>
+            <div className="font-medium">
+              {feature.values[offer.id] !== undefined
+                ? parseFeatureValue(feature.values[offer.id] as string)
+                : (
+                  <div className="flex items-center justify-start text-left w-full text-neutral-500 dark:text-neutral-400">
+                    <span className="flex-grow pl-7">—</span>
+                  </div>
+                )
+              }
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Assuming CtaButton is specific to the section and not per card, so it stays outside */}
+      {/* If each card had its own CTA, it would be here */}
+
+    </motion.div>
   );
 };
 
@@ -114,7 +220,7 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
   // Edge case: invalid number of offers
   if (offers.length !== 3) {
     return (
-      <section className={twMerge(`bg-neutral-950 text-neutral-50 dark:bg-white dark:text-neutral-900 py-20 px-4 md:px-8`, className)}>
+      <section className={twMerge("bg-neutral-950 text-neutral-50 dark:bg-white dark:text-neutral-900 py-20 px-4 md:px-8", className)}>
         <div className="text-center text-red-500 dark:text-red-600">
           <p className="font-semibold text-lg">Configuration Error</p>
           <p>The pricing comparison section requires exactly three offers to display correctly. Received {offers.length}.</p>
@@ -145,7 +251,7 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
 
   return (
     <section
-      className={twMerge(`bg-neutral-950 text-neutral-50 dark:bg-white dark:text-neutral-900 py-16 sm:py-20 px-4 md:px-8 overflow-hidden`, className)}
+      className={twMerge("bg-neutral-950 text-neutral-50 dark:bg-white dark:text-neutral-900 py-16 sm:py-20 px-4 md:px-8 overflow-hidden", className)}
       aria-labelledby={headlineId}
     >
       <motion.h2
@@ -173,102 +279,27 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
           const isCenterCard = offerIndex === centerOfferIndex;
           const scaleClass = isHighlighted ? (isCenterCard ? 'lg:scale-110' : 'md:scale-105') : '';
 
-          // Determine order classes based on index
-          let orderClasses = "";
-          if (offerIndex === 0) { // DIY
+          let orderClasses = "order-1";
+          if (offerIndex === 0) { 
             orderClasses = "order-1";
-          } else if (offerIndex === 1) { // Gruntworks
+          } else if (offerIndex === 1) { 
             orderClasses = "order-3 lg:order-2";
-          } else if (offerIndex === 2) { // Traditional Agency
+          } else if (offerIndex === 2) { 
             orderClasses = "order-2 lg:order-3";
           }
 
           return (
-            <motion.div
+            <PricingCard
               key={offer.id}
-              custom={offerIndex}
-              initial="hidden"
-              animate="visible"
-              variants={cardVariants}
-              role="group"
-              aria-labelledby={`offer-${offer.id}-name`}
-              className={twMerge(`
-                rounded-2xl bg-neutral-800 dark:bg-neutral-100 p-6 flex flex-col text-neutral-50 dark:text-neutral-900
-                focus-within:ring-4 focus-within:ring-orange-500/70 dark:focus-within:ring-orange-600/70
-                transition-all duration-300 ease-out
-                ${isHighlighted ? `ring-4 ring-orange-500 dark:ring-orange-600 shadow-2xl relative ${scaleClass}` : 'shadow-lg hover:shadow-xl'}
-                ${isHighlighted && isCenterCard && 'lg:z-10'}
-                ${isHighlighted && isCenterCard ? 'lg:origin-top' : ''}
-              `, orderClasses)}
-            >
-              {isHighlighted && (
-                <div
-                  aria-label="Best value"
-                  className="absolute -top-3.5 right-3.5 bg-orange-500 text-neutral-950 text-xs font-semibold px-2.5 py-1 rounded-full shadow-md"
-                >
-                  Best Value
-                </div>
-              )}
-
-              <div className="text-center mb-4">
-                <h3
-                  id={`offer-${offer.id}-name`}
-                  className="text-xl lg:text-2xl font-semibold mb-1 flex items-center justify-center gap-2 text-neutral-50 dark:text-neutral-900"
-                >
-                  {offer.icon && <span className="inline-block text-orange-400 dark:text-orange-500">{offer.icon}</span>}
-                  {offer.name}
-                </h3>
-                {offer.priceNote && (
-                  <p className="text-xs text-neutral-400 dark:text-neutral-500">
-                    {offer.priceNote}
-                  </p>
-                )}
-              </div>
-
-              {offer.mainDifferentiator && (
-                <div className={twMerge(`text-center px-2 py-3 mb-4 rounded-lg
-                  ${isHighlighted ? 'bg-orange-500/10 dark:bg-orange-500/20' : 'bg-neutral-700/50 dark:bg-neutral-200/80'}`)}>
-                  <p className={twMerge(`font-semibold text-sm ${isHighlighted ? 'text-orange-300 dark:text-orange-400' : 'text-neutral-200 dark:text-neutral-700'}`)}>
-                    {offer.mainDifferentiator}
-                  </p>
-                </div>
-              )}
-
-              <div className="my-2 flex-grow">
-                {features.map((feature) => (
-                  <div
-                    key={feature.label}
-                    className="text-sm border-t border-neutral-700 dark:border-neutral-300 py-3"
-                  >
-                    <p className="text-neutral-400 dark:text-neutral-500 text-xs mb-1.5 font-medium break-words">{feature.label}</p>
-                    <div className="font-medium">
-                      {feature.values[offer.id] !== undefined
-                        ? parseFeatureValue(feature.values[offer.id] as string)
-                        : (
-                          <div className="flex items-center justify-start text-left w-full text-neutral-500 dark:text-neutral-400">
-                            <span className="flex-grow pl-7">—</span>
-                          </div>
-                        )
-                      }
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {isCenterCard && isHighlighted && (
-                <div className="mt-auto pt-6 text-center sm:hidden md:block">
-                  <CtaButton
-                    as="motion.a"
-                    href={ctaHref}
-                    id={ctaButtonId}
-                    aria-describedby={headlineId}
-                    className="w-full sm:w-auto"
-                  >
-                    {ctaLabel}
-                  </CtaButton>
-                </div>
-              )}
-            </motion.div>
+              offer={offer}
+              offerIndex={offerIndex}
+              isHighlighted={isHighlighted}
+              isCenterCard={isCenterCard}
+              features={features}
+              cardVariants={cardVariants}
+              scaleClass={scaleClass}
+              orderClasses={orderClasses}
+            />
           );
         })}
       </div>
@@ -276,13 +307,10 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
       {/* Centered CTA Button */}
       <div className="text-center mt-12">
         <CtaButton
-          as="motion.a"
-          href={ctaHref}
-          id={ctaButtonId}
-          aria-describedby={headlineId}
-          className="mt-10 md:mt-12"
+          href="/audit"
+          variant="urgent"
         >
-          {ctaLabel}
+          Start Audit
         </CtaButton>
       </div>
     </section>

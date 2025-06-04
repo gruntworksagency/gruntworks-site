@@ -45,8 +45,8 @@ export const timelineSteps: TimelineStepData[] = [
 
 const HowItWorksSection: React.FC = () => {
   return (
-    <section className="relative py-16 lg:py-24 bg-[url('/textures/darker-rock-texture.jpg')] bg-cover bg-center how-it-works-gradient-overlay">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <section className="relative howitworks-bg-transition pt-24 pb-24 lg:pt-32 lg:pb-32">
+      <div className="container mx-auto px-4 max-w-4xl relative z-10">
         {/* Pill above heading */}
         <div className="flex justify-center mb-4">
           <Pill mainText="How It Works" secondaryText="" />
@@ -73,13 +73,14 @@ const HowItWorksSection: React.FC = () => {
                   subtitle={step.duration}
                   description={step.microCopy}
                   href={step.href}
-                  className="flex flex-col pt-6" // pt-6 to make space for badge
+                  className="flex flex-col pt-6 shadow-lg" // pt-6 to make space for badge
                 />
               </div>
               {/* Mobile/Tablet Vertical Arrow: render as a flex row between cards */}
               {idx < timelineSteps.length - 1 && (
                 <div className="lg:hidden flex justify-center items-center w-full my-2" aria-hidden="true">
-                  <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vertical arrow connecting steps">
+                    <title>Vertical arrow</title>
                     <line x1="12" y1="4" x2="12" y2="28" stroke="#FFA500" strokeWidth="3" strokeLinecap="round" />
                     <polygon points="6,28 12,32 18,28" fill="#FFA500" />
                   </svg>
@@ -97,7 +98,8 @@ const HowItWorksSection: React.FC = () => {
                 style={{ gridColumn: `${idx + 1} / span 1` }}
               >
                 {/* Horizontal Arrow SVG */}
-                <svg width="64" height="24" viewBox="0 0 64 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="64" height="24" viewBox="0 0 64 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Horizontal arrow connecting steps">
+                  <title>Horizontal arrow</title>
                   <line x1="4" y1="12" x2="60" y2="12" stroke="#FFA500" strokeWidth="3" strokeLinecap="round" />
                   <polygon points="60,6 64,12 60,18" fill="#FFA500" />
                 </svg>

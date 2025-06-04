@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import CtaButton from '../UI/CtaButton';
 
@@ -84,6 +84,7 @@ const Header: React.FC = () => {
               <button
                 ref={buttonRef}
                 onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                type="button"
                 className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
                 aria-expanded={isMoreMenuOpen}
                 aria-controls="more-menu-dropdown"
@@ -108,11 +109,9 @@ const Header: React.FC = () => {
           {/* Right-aligned Action Button */}
           <div>
             <CtaButton
-              as="link"
               href="/audit"
-              className="px-4 py-2 text-sm shadow-sm"
             >
-              Start Audit <ArrowRight className="ml-2 h-4 w-4" />
+              Start Audit
             </CtaButton>
           </div>
         </div>
@@ -127,8 +126,8 @@ const Header: React.FC = () => {
           >
             <h3 className="text-gray-800 font-semibold text-lg mb-5 text-center">Explore Our Services</h3>
             <div className="grid grid-cols-3 gap-4">
-              {subMenuItems.map((item, index) => (
-                <Link href={item.href} key={index} className={clsx(
+              {subMenuItems.map((item) => (
+                <Link href={item.href} key={item.href} className={clsx(
                   "rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-white/20 group block",
                   item.gradientFrom, item.gradientTo,
                   "bg-gradient-to-b" // Apply gradient
@@ -148,7 +147,7 @@ const Header: React.FC = () => {
 
       {/* Overlay to close menu when clicking outside (handled by useEffect) */}
       {/* The visual overlay div could still be useful for a subtle background dimming effect if desired */}
-      {isMoreMenuOpen && <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setIsMoreMenuOpen(false)} aria-hidden="true" />}
+      {isMoreMenuOpen && <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setIsMoreMenuOpen(false)} onKeyDown={(e) => { if (e.key === 'Escape') setIsMoreMenuOpen(false); }} tabIndex={0} role="button" aria-hidden="true" />}
     </>
   );
 };

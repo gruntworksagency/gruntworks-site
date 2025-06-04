@@ -54,6 +54,118 @@
     z-index: 1;
   }
 
+  .features-gradient-bg {
+    background: linear-gradient(180deg, 
+      #1D150E 0%, 
+      #1D150E 40%, 
+      rgba(29, 21, 14, 0.95) 60%, 
+      rgba(35, 30, 25, 0.9) 75%, 
+      rgba(40, 35, 30, 0.85) 85%, 
+      rgba(45, 39, 33, 0.8) 95%, 
+      rgba(45, 39, 33, 0.7) 100%
+    );
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .features-gradient-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/darker-rock-texture.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    z-index: -1;
+    background-attachment: fixed;
+    animation: fadeInRockTexture 0.8s ease-in-out 0.3s forwards;
+  }
+
+  @keyframes fadeInRockTexture {
+    0% { opacity: 0; }
+    100% { opacity: 0.3; }
+  }
+
+  /* Extended transition zone */
+  .features-gradient-bg::after {
+    content: "";
+    position: absolute;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(180deg, 
+      rgba(45, 39, 33, 0) 0%, 
+      rgba(45, 39, 33, 0.3) 20%, 
+      rgba(50, 44, 38, 0.5) 40%, 
+      rgba(55, 49, 43, 0.65) 60%, 
+      rgba(60, 54, 48, 0.75) 80%, 
+      rgba(65, 59, 53, 0.85) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .howitworks-bg-transition {
+    position: relative;
+    background: linear-gradient(180deg, 
+      rgba(65, 59, 53, 0.9) 0%, 
+      rgba(60, 54, 48, 0.85) 15%, 
+      rgba(55, 49, 43, 0.8) 30%, 
+      rgba(50, 44, 38, 0.75) 45%, 
+      rgba(45, 39, 33, 0.7) 60%, 
+      rgba(40, 35, 30, 0.65) 75%, 
+      rgba(35, 30, 25, 0.6) 90%, 
+      rgba(30, 25, 20, 0.55) 100%
+    );
+    z-index: 0;
+    overflow: hidden;
+    margin-top: -100px;
+    padding-top: 100px;
+  }
+
+  .howitworks-bg-transition::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/darker-rock-texture.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.4;
+    z-index: -2;
+  }
+
+  .howitworks-bg-transition::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/heatworks-pattern-2.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0;
+    z-index: -1;
+    mix-blend-mode: soft-light;
+    animation: gradualPatternFade 2s ease-in-out 1s forwards;
+  }
+
+  @keyframes gradualPatternFade {
+    0% { 
+      opacity: 0; 
+      transform: scale(1.05);
+    }
+    50% { 
+      opacity: 0.15; 
+      transform: scale(1.02);
+    }
+    100% { 
+      opacity: 0.25; 
+      transform: scale(1);
+    }
+  }
+
   .film-grain-overlay {
     position: relative;
     /* Ensure this or parent is relative */
@@ -77,5 +189,17 @@
     /* To sit on top of the image */
     border-radius: inherit;
     /* Inherit border-radius from parent if it's rounded */
+  }
+
+  @keyframes subtle-arrow-move {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    50% {
+      transform: translateX(3px);
+    }
   }
 }

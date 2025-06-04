@@ -3,7 +3,7 @@ import { prisma } from '@repo/db';
 
 interface TrackEventRequestBody {
   event_type: string;
-  event_data?: Record<string, any>;
+  event_data?: Record<string, string | number | boolean | null> | null;
   client_slug?: string;
   session_id?: string;
 }

@@ -99,11 +99,7 @@ const FAQAccordionSection: React.FC<FAQAccordionSectionProps> = ({
               )}
             >
               <div className="px-6 pb-6 text-neutral-300 leading-relaxed prose prose-invert">
-                {typeof item.answer === "string" ? (
-                  <div dangerouslySetInnerHTML={{ __html: item.answer }} />
-                ) : (
-                  item.answer
-                )}
+                {item.answer}
               </div>
             </Accordion.Content>
           </Accordion.Item>

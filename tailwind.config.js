@@ -63,11 +63,25 @@ module.exports = {
       },
       animation: {
         fadeIn: 'fadeIn 0.2s ease-out forwards',
+        'arrow-move': 'arrow-move 0.8s ease-out infinite',
+        'subtle-glow': 'subtle-glow 1s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0', transform: 'scale(0.98)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'arrow-move': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(3px)' },
+        },
+        'subtle-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 5px rgba(239, 68, 68, 0.1), 0 0 10px rgba(239, 68, 68, 0.5)',
+          },
+          '50%': {
+            boxShadow: '0 0 8px rgba(239, 68, 68, 0.7), 0 0 15px rgba(239, 68, 68, 0.5)',
+          },
         },
       },
       boxShadow: {

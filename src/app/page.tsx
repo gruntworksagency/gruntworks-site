@@ -156,7 +156,6 @@ const HomePage: NextPage = () => {
         ctaLabel="View More FAQ's"
         ctaHref="/faqs"
       />
-      {/* Add the PricingComparisonSection */}
       <PricingComparisonSection {...DUMMY_PRICING_DATA} />
     </main>
   );

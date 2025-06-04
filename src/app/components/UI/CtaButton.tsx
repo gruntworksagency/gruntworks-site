@@ -1,114 +1,61 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, ComponentProps } from 'react';
+import Link from 'next/link';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import Link from 'next/link';
-import dynamic from 'next/dynamic';
+import { ArrowRight, Zap } from 'lucide-react';
 
-// Dynamically import the MotionLink component to avoid client boundary issues
-const MotionLink = dynamic(
-  () => import('../UI/MotionLink').then(mod => mod.default),
-  { ssr: false }
-);
-
-interface CtaButtonProps {
+interface CtaButtonProps extends Omit<ComponentProps<'a'>, 'children' | 'href' | 'className' | 'ref'> {
   children: React.ReactNode;
+  href: string;
+  variant?: 'regular' | 'small' | 'urgent';
   className?: string;
-  as?: 'button' | 'link' | 'motion.a';
-  href?: string;
-  variant?: 'primary' | 'secondary';
-  // Animation props for motion.a variant
-  whileHover?: object;
-  whileTap?: object;
-  transition?: object;
-  // Standard HTML attributes
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
-  'aria-describedby'?: string;
-  id?: string;
-  [key: string]: any; // Allow for other props to be passed through
+  // Removed [key: string]: any; // Allow for other props (e.g., aria-label)
 }
 
-const CtaButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, CtaButtonProps>(({
-  children,
-  className,
-  as = 'button',
-  href = '#',
-  variant = 'primary',
-  whileHover,
-  whileTap,
-  transition,
-  ...restProps
-}, ref) => {
-  // Base classes for all button variants
-  const baseClasses = twMerge(
-    clsx(
-      'font-semibold py-3 px-8 rounded-lg transition-colors duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-brand-safetyOrange focus:ring-opacity-50 inline-flex items-center justify-center',
-      // Primary variant styling
-      variant === 'primary' && 'bg-brand-safetyOrange hover:bg-brand-safetyOrangeDarker text-brand-brandCream shadow-inner-md',
-      // Add support for secondary variant if needed in the future
-      variant === 'secondary' && 'bg-transparent border border-brand-safetyOrange text-brand-safetyOrange hover:bg-brand-safetyOrange/10',
-      className
-    )
-  );
-
-  // Render as regular button (default)
-  if (as === 'button') {
-    return (
-      <button
-        ref={ref as React.Ref<HTMLButtonElement>}
-        className={baseClasses}
-        type={restProps.type || 'button'}
-        {...restProps}
-      >
-        {children}
-      </button>
+const CtaButton = forwardRef<HTMLAnchorElement, CtaButtonProps>(
+  ({
+    children,
+    href,
+    variant = 'regular',
+    className,
+    ...restProps
+  }, ref) => {
+    const baseClasses = twMerge(
+      clsx(
+        'group',
+        'inline-flex items-center justify-center font-semibold rounded-lg transition-colors duration-200 ease-out shadow-md',
+        'bg-brand-safetyOrange text-brand-brandCream border-2 border-orange-200',
+        'hover:bg-brand-safetyOrangeDarker hover:border-yellow-500 hover:text-brand-pureWhite',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-safetyOrange/80 dark:focus:ring-brand-safetyOrange',
+        variant === 'regular' && 'py-4 px-6 text-base gap-2',
+        variant === 'small' && 'py-2 px-4 text-sm gap-1.5',
+        variant === 'urgent' && [
+          'py-4 px-6 text-base gap-2',
+          'ring-2 ring-red-500 ring-offset-2',
+          'hover:ring-red-600 hover:ring-offset-2',
+          'focus:ring-red-500 focus:ring-offset-4',
+          'animate-subtle-glow hover:animate-none'
+        ],
+        className
+      )
     );
-  }
 
-  // Render as Next.js Link
-  if (as === 'link') {
+    const iconSize = variant === 'small' ? 18 : 22;
+
     return (
-      <Link
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={href}
-        className={baseClasses}
+      <Link 
+        href={href} 
+        className={baseClasses} 
+        ref={ref} 
         {...restProps}
       >
-        {children}
+          <Zap aria-hidden="true" size={iconSize} className="mr-1" />
+          <span>{children}</span>
+          <ArrowRight aria-hidden="true" size={iconSize} className="ml-1 group-hover:animate-arrow-move" />
       </Link>
     );
   }
-
-  // Render as Framer Motion motion.a
-  if (as === 'motion.a') {
-    return (
-      <MotionLink
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={href}
-        className={baseClasses}
-        whileHover={whileHover || { transform: 'translateY(-2px)' }}
-        whileTap={whileTap || { scale: 0.97, transform: 'translateY(-1px)' }}
-        transition={transition || { duration: 0.15 }}
-        {...restProps}
-      >
-        {children}
-      </MotionLink>
-    );
-  }
-
-  // Fallback to button if invalid 'as' prop
-  return (
-    <button
-      ref={ref as React.Ref<HTMLButtonElement>}
-      className={baseClasses}
-      type={restProps.type || 'button'}
-      {...restProps}
-    >
-      {children}
-    </button>
-  );
-});
+);
 
 CtaButton.displayName = 'CtaButton';
 

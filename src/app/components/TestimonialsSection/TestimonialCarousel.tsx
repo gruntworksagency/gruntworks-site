@@ -46,18 +46,11 @@ const TestimonialCarousel: React.FC<TestimonialCarouselProps> = ({ testimonials,
   }, [handleNext, totalSlides, stopAutoplay]);
 
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && totalSlides > 1) {
       startAutoplay();
     }
     return () => stopAutoplay();
-  }, [isPlaying, startAutoplay, stopAutoplay]);
-
-  useEffect(() => {
-    if (isPlaying && totalSlides > 1) {
-      startAutoplay(); // Restart timer on manual navigation if still playing
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, isPlaying, totalSlides]); // Intentionally not including startAutoplay to avoid loop on its own recreation
+  }, [isPlaying, startAutoplay, stopAutoplay, totalSlides]);
 
   if (!testimonials || testimonials.length === 0) {
     return null;
@@ -74,9 +67,10 @@ const TestimonialCarousel: React.FC<TestimonialCarouselProps> = ({ testimonials,
       aria-roledescription="carousel"
       aria-label="Testimonials"
     >
-      <div className="relative flex items-center justify-center w-full overflow-hidden" style={{ minHeight: '450px' }}> {/* Adjusted minHeight for card + frame */}
+      <div className="relative flex items-center justify-center w-full overflow-hidden" style={{ minHeight: '450px' }}>
         {totalSlides > 1 && (
           <button
+            type="button"
             onClick={() => { handlePrev(); stopAutoplay(); }}
             className="absolute left-xs sm:left-s md:left-m top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-brand-creamWhite/50 hover:bg-brand-creamWhite/80 transition-colors shadow-md"
             aria-label="Previous testimonial"
@@ -86,25 +80,24 @@ const TestimonialCarousel: React.FC<TestimonialCarouselProps> = ({ testimonials,
         )}
 
         <div
-          key={currentTestimonial.id} // Key for re-render and animation triggering
+          key={currentTestimonial.id}
           className="animate-fadeIn flex items-center justify-center"
           role="group"
           aria-roledescription="slide"
           aria-label={`Testimonial ${currentIndex + 1} of ${totalSlides}`}
-          style={{ width: '100%' }} // Ensure it takes space for centering if shield is smaller
+          style={{ width: '100%' }}
         >
           <ShieldBadgeFrame>
             <TestimonialCard
               author={currentTestimonial.author}
               text={currentTestimonial.quote}
-            // Ensure TestimonialCard has a defined max-width if ShieldBadgeFrame doesn't constrain it enough
-            // e.g., className="max-w-[320px]"
             />
           </ShieldBadgeFrame>
         </div>
 
         {totalSlides > 1 && (
           <button
+            type="button"
             onClick={() => { handleNext(); stopAutoplay(); }}
             className="absolute right-xs sm:right-s md:right-m top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-brand-creamWhite/50 hover:bg-brand-creamWhite/80 transition-colors shadow-md"
             aria-label="Next testimonial"
@@ -116,9 +109,10 @@ const TestimonialCarousel: React.FC<TestimonialCarouselProps> = ({ testimonials,
 
       {totalSlides > 1 && (
         <div className="flex justify-center space-x-2 mt-m" role="tablist" aria-label="Testimonial navigation dots">
-          {testimonials.map((_, index) => (
+          {testimonials.map((item, index) => (
             <button
-              key={index}
+              key={item.id}
+              type="button"
               onClick={() => {
                 setCurrentIndex(index);
                 stopAutoplay();

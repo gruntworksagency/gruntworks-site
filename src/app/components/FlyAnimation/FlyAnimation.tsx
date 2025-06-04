@@ -40,7 +40,10 @@ const getAbsolutePosition = (
     return null;
   }
   const containerRect = containerElement.getBoundingClientRect();
-  const targetElement = targetRefs[targetKey].current!;
+  const targetElement = targetRefs[targetKey].current;
+  if (!targetElement) {
+    return null;
+  }
   const targetRect = targetElement.getBoundingClientRect();
   const offset = targetOffsets?.[targetKey] || { x: 0, y: 0 };
 
@@ -149,11 +152,11 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
   useEffect(() => {
     if (!isVisible || !containerRef.current || !hasRunInitialSetup.current) return;
 
-    const animateFlightSequence = async () => {
-      const sourceKey = sequence[sequenceIndex];
-      const nextIndex = (sequenceIndex + 1) % sequence.length;
-      const destinationKey = sequence[nextIndex];
-
+    const getAnimationPathEndpoints = (
+      currentFlyTopLeft: { x: number; y: number } | null,
+      sourceKey: TargetKey,
+      destinationKey: TargetKey
+    ): { pathStartPos: { x: number; y: number }; pathEndPos: { x: number; y: number } } | null => {
       let pathStartPos: { x: number; y: number } | null = null;
       if (currentFlyTopLeft) {
         pathStartPos = {
@@ -161,39 +164,43 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
           y: currentFlyTopLeft.y + flyHeight / 2,
         };
       } else {
-        pathStartPos = getAbsolutePosition(sourceKey, targetRefs, targetOffsets, containerRef.current!);
+        const containerElement = containerRef.current;
+        if (containerElement) {
+          pathStartPos = getAbsolutePosition(sourceKey, targetRefs, targetOffsets, containerElement);
+        }
       }
 
-      const pathEndPos = getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerRef.current!);
+      const containerElement = containerRef.current;
+      const pathEndPos = containerElement ? getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerElement) : null;
 
       if (!pathStartPos || !pathEndPos) {
-        if (pathStartPos && !pathEndPos) {
-          await new Promise(resolve => setTimeout(resolve, pauseDuration));
-        } else if (!pathStartPos && pathEndPos && containerRef.current) {
-          const newTopLeft = { x: pathEndPos.x - flyWidth / 2, y: pathEndPos.y - flyHeight / 2 };
-          flyControls.set(newTopLeft);
-          setCurrentFlyTopLeft(newTopLeft);
-        } else {
-          console.error("[FlyAnimation] Critical error: Cannot determine path. Skipping this leg.");
-        }
-        setSequenceIndex(nextIndex);
-        return;
+        return null;
       }
+      return { pathStartPos, pathEndPos };
+    };
 
-      await new Promise(resolve => setTimeout(resolve, pauseDuration));
-
-      // 2. Pre-Flight Flip Animation
-      const nextFlipState = isInitialFlight ? false : !isFlipped; // false means scaleX: 1 (normal)
+    const performPreFlightFlip = async (
+      flyControls: AnimationControls,
+      currentIsInitialFlight: boolean,
+      currentIsFlipped: boolean
+    ): Promise<boolean> => {
+      const nextFlipState = currentIsInitialFlight ? false : !currentIsFlipped;
       await flyControls.start({
         scaleX: nextFlipState ? 1 : -1,
         transition: { duration: flipDuration / 1000, ease: "easeInOut" },
       });
       setIsFlipped(nextFlipState);
-      if (isInitialFlight) {
+      if (currentIsInitialFlight) {
         setIsInitialFlight(false);
       }
+      return nextFlipState;
+    };
 
-      // 3. Generate Random Flight Path Keyframes
+    const executeFlight = async (
+      flyControls: AnimationControls,
+      pathStartPos: { x: number; y: number },
+      pathEndPos: { x: number; y: number }
+    ): Promise<{ x: number; y: number } | null> => {
       const { xKeyframes, yKeyframes, times } = generateCurvedPathKeyframes(
         pathStartPos,
         pathEndPos,
@@ -203,7 +210,6 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
         pathKeyframeSamples
       );
 
-      // 4. Execute Flight Animation
       await flyControls.start({
         x: xKeyframes,
         y: yKeyframes,
@@ -213,11 +219,73 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
           times: times,
         },
       });
+      
+      if (xKeyframes.length > 0 && yKeyframes.length > 0) {
+        return { x: xKeyframes[xKeyframes.length - 1], y: yKeyframes[yKeyframes.length - 1] };
+      }
+      return null;
+    };
 
-      // 5. Arrival at Destination
-      const newTopLeft = { x: xKeyframes[xKeyframes.length - 1], y: yKeyframes[yKeyframes.length - 1] };
-      setCurrentFlyTopLeft(newTopLeft);
-      // Advance to next sequence index
+    const handleMissingPathEndpoints = async (
+      destinationKey: TargetKey,
+      nextIdx: number,
+      currentFlyPos: typeof currentFlyTopLeft
+    ): Promise<void> => {
+      const containerElement = containerRef.current;
+      if (currentFlyPos && !getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerElement || null) && containerElement) {
+        // If start is known but end is not, just pause and try next
+        await new Promise(resolve => setTimeout(resolve, pauseDuration));
+      } else if (!currentFlyPos && containerElement) {
+        const endPos = getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerElement);
+        if (endPos) { // Fly was not visible, but a target is. Snap to it.
+          const newTopLeft = { x: endPos.x - flyWidth / 2, y: endPos.y - flyHeight / 2 };
+          flyControls.set(newTopLeft);
+          setCurrentFlyTopLeft(newTopLeft);
+        } else {
+          console.error("[FlyAnimation] Critical error: Cannot determine path when fly not visible. Skipping this leg.");
+        }
+      } else {
+        console.error("[FlyAnimation] Critical error: Cannot determine path (both start/end unknown or container missing). Skipping this leg.");
+      }
+      setSequenceIndex(nextIdx);
+    };
+
+    const handleFailedFlightExecution = (destinationKey: TargetKey): void => {
+      console.error("[FlyAnimation] Flight execution did not return a valid end position.");
+      const expectedEndPosAbsolute = getAbsolutePosition(destinationKey, targetRefs, targetOffsets, containerRef.current);
+      if (expectedEndPosAbsolute) {
+        const fallbackTopLeft = { x: expectedEndPosAbsolute.x - flyWidth / 2, y: expectedEndPosAbsolute.y - flyHeight / 2 };
+        flyControls.set(fallbackTopLeft);
+        setCurrentFlyTopLeft(fallbackTopLeft);
+      }
+    };
+
+    const animateFlightSequence = async () => {
+      const sourceKey = sequence[sequenceIndex];
+      const nextIndex = (sequenceIndex + 1) % sequence.length;
+      const destinationKey = sequence[nextIndex];
+
+      const pathEndpoints = getAnimationPathEndpoints(currentFlyTopLeft, sourceKey, destinationKey);
+
+      if (!pathEndpoints) {
+        await handleMissingPathEndpoints(destinationKey, nextIndex, currentFlyTopLeft);
+        return;
+      }
+
+      const { pathStartPos, pathEndPos } = pathEndpoints;
+
+      await new Promise(resolve => setTimeout(resolve, pauseDuration));
+
+      await performPreFlightFlip(flyControls, isInitialFlight, isFlipped);
+      
+      const newTopLeft = await executeFlight(flyControls, pathStartPos, pathEndPos);
+
+      if (newTopLeft) {
+        setCurrentFlyTopLeft(newTopLeft);
+      } else {
+        handleFailedFlightExecution(destinationKey);
+      }
+      
       setSequenceIndex(nextIndex);
     };
 
@@ -242,6 +310,9 @@ const FlyAnimation: React.FC<FlyAnimationProps> = ({
     flipDuration,
     pathRandomnessFactor,
     pathKeyframeSamples,
+    currentFlyTopLeft,
+    isFlipped,
+    isInitialFlight,
   ]);
 
   if (!isVisible) {

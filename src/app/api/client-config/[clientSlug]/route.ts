@@ -3,10 +3,10 @@ import { prisma } from '@repo/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { clientSlug: string } }
+  { params }: { params: Promise<{ clientSlug: string }> }
 ) {
   try {
-    const { clientSlug } = params;
+    const { clientSlug } = await params;
 
     if (!clientSlug) {
       return NextResponse.json({ error: 'Client slug is required.' }, { status: 400 });
@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json(client, { status: 200 });
 
   } catch (error) {
-    console.error(`API Error - /api/client-config/${params.clientSlug}:`, error);
+    console.error("API Error - /api/client-config:", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

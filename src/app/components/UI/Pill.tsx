@@ -23,7 +23,7 @@ const Pill = forwardRef<HTMLElement, PillProps>(({
     <Element
       className={twMerge(
         clsx(
-          'bg-white stroke-slate-700 stroke-2 px-3 py-1 rounded-full text-[10px] font-semibold mb-4 backdrop-blur-sm',
+          'bg-white stroke-slate-700 stroke-2 px-6 py-3 rounded-full text-[12px] font-semibold mb-4 backdrop-blur-sm',
           className
         )
       )}
