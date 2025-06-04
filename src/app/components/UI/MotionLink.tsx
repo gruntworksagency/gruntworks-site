@@ -1,28 +1,30 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import React, { forwardRef, ComponentProps } from 'react';
+import React, { ComponentProps } from 'react';
 
-interface MotionLinkProps extends Omit<ComponentProps<'a'>, 'children' | 'href' | 'className' | 'ref'> {
+interface MotionLinkProps extends Omit<ComponentProps<'a'>, 'children' | 'href' | 'className'> {
   children: React.ReactNode;
   href: string;
   className?: string;
   whileHover?: object;
   whileTap?: object;
   transition?: object;
+  ref?: React.Ref<HTMLAnchorElement>;
   'aria-describedby'?: string;
   id?: string;
 }
 
-const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(({
+const MotionLink: React.FC<MotionLinkProps> = ({
   children,
   href,
   className,
   whileHover,
   whileTap,
   transition,
+  ref,
   ...restProps
-}, ref) => {
+}) => {
   return (
     <motion.a
       ref={ref}
@@ -36,8 +38,6 @@ const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(({
       {children}
     </motion.a>
   );
-});
-
-MotionLink.displayName = 'MotionLink';
+};
 
 export default MotionLink; 
