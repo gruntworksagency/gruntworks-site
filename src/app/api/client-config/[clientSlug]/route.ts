@@ -3,10 +3,10 @@ import { prisma } from '@repo/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ clientSlug: string }> }
+  { params }: { params: { clientSlug: string } }
 ) {
   try {
-    const { clientSlug } = await params;
+    const { clientSlug } = params;
 
     if (!clientSlug) {
       return NextResponse.json({ error: 'Client slug is required.' }, { status: 400 });
