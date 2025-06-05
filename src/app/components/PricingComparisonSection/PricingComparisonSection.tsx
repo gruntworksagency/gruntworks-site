@@ -192,8 +192,17 @@ const PricingCard: React.FC<PricingCardProps> = ({
         ))}
       </div>
       
-      {/* Assuming CtaButton is specific to the section and not per card, so it stays outside */}
-      {/* If each card had its own CTA, it would be here */}
+      {/* CTA Button for highlighted card only */}
+      {isHighlighted && (
+        <div className="text-center mt-12">
+          <CtaButton
+            href="/audit"
+            variant="urgent"
+          >
+            Start Audit
+          </CtaButton>
+        </div>
+      )}
 
     </motion.div>
   );
@@ -302,17 +311,7 @@ const PricingComparisonSection: React.FC<PricingComparisonSectionProps> = ({
             />
           );
         })}
-      </div>
-
-      {/* Centered CTA Button */}
-      <div className="text-center mt-12">
-        <CtaButton
-          href="/audit"
-          variant="urgent"
-        >
-          Start Audit
-        </CtaButton>
-      </div>
+      </div> 
     </section>
   );
 };
